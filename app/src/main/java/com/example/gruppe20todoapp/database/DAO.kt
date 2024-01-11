@@ -21,4 +21,17 @@ interface DAO {
 
     @Delete
     fun deleteTask(todo: TodoEntity)
+
+    @Query("SELECT * FROM tasks WHERE done = 1")
+    fun getCompletedTasks(): Flow<List<TodoEntity>>
+
+    @Query("SELECT * FROM tasks WHERE done = 0")
+    fun getNotCompletedTasks(): Flow<List<TodoEntity>>
+
+    @Query("SELECT * FROM tasks")
+    fun getAllTasks(): Flow<List<TodoEntity>>
+    @Query("SELECT * FROM `tasks` WHERE `title` LIKE :searchQuery OR `description` LIKE :searchQuery")
+    fun searchTasks(searchQuery: String): Flow<List<TodoEntity>>
+
+
 }
