@@ -34,7 +34,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,7 +44,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -68,6 +66,7 @@ import  androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gruppe20todoapp.database.TodoEntity
 import com.example.gruppe20todoapp.database.addDate
 import com.example.gruppe20todoapp.ui.theme.Dark100
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -108,45 +107,59 @@ fun MainScreen(
         }
 
 
-        Dialog(onDismissRequest = { setDialogOpen(false) }) {
+        Dialog(onDismissRequest = { setDialogOpen(false) },
+            ) {
             Column(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.primary)
-                    .padding(8.dp),
+                    .padding(8.dp)
+                    .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                Text(
+                    text = "Add Task",
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(8.dp)
+
+                )
                 OutlinedTextField(
                     value = title,
-                    onValueChange = {
-                        setTitle(it)
-                    },
+                    onValueChange = setTitle,
                     modifier = Modifier.fillMaxWidth(),
-                    label = {
-                        Text(text = "Title")
-                    }, colors = TextFieldDefaults.outlinedTextFieldColors(
+                    label = { Text("Title",  style = MaterialTheme.typography.bodyLarge) },
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.White,
                         focusedBorderColor = Color.White,
+                        unfocusedBorderColor = Color.LightGray,
                         focusedLabelColor = Color.White,
-                        textColor = Color.White
+                        unfocusedLabelColor = Color.LightGray
                     )
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 OutlinedTextField(
                     value = description,
                     onValueChange = {
                         setDesc(it)
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    label = {
-                        Text(text = "Description")
-                    }, colors = TextFieldDefaults.outlinedTextFieldColors(
+                    label = { Text(text = "Description", style = MaterialTheme.typography.bodyLarge) },
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.White,
                         focusedBorderColor = Color.White,
+                        unfocusedBorderColor = Color.LightGray,
                         focusedLabelColor = Color.White,
-                        textColor = Color.White
+                        unfocusedLabelColor = Color.LightGray
                     )
                 )
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(15.dp))
                 Button(
                     onClick = {
                         if (title.isNotEmpty() && description.isNotEmpty()) {
@@ -165,7 +178,7 @@ fun MainScreen(
                         containerColor = MaterialTheme.colorScheme.secondary
                     )
                 ) {
-                    Text(text = "Submit", fontSize = 18.sp, color = Color.White)
+                    Text(text = "Submit", fontSize = 18.sp, color = Color.White, style = MaterialTheme.typography.labelLarge)
                 }
             }
         }
@@ -296,6 +309,7 @@ fun FilterButtons(viewModel: MainVM) {
         )
         Spacer(Modifier.size(8.dp))
         FilterButton(
+
             text = "Not Completed",
             selected = filterState == MainVM.FilterState.NOT_COMPLETED,
             onClick = { viewModel.showNotCompletedTasks() }
@@ -452,33 +466,90 @@ fun EditTaskDialog(
     var title by remember { mutableStateOf(task.title) }
     var description by remember { mutableStateOf(task.description) }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = "Edit Task") },
-        text = {
-            Column {
-                TextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Title") }
+    Dialog(onDismissRequest = onDismiss) {
+        // Dialog's content
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Edit Task",
+                fontSize = 20.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(8.dp)
+            )
+            OutlinedTextField(
+                value = title,
+                onValueChange = { title = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Title",  style = MaterialTheme.typography.bodyLarge) },
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    textColor = Color.White,
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.LightGray,
+                    focusedLabelColor = Color.White,
+                    unfocusedLabelColor = Color.LightGray
                 )
-                TextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text("Description") }
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(text = "Description", style = MaterialTheme.typography.bodyLarge) },
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    textColor = Color.White,
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.LightGray,
+                    focusedLabelColor = Color.White,
+                    unfocusedLabelColor = Color.LightGray
                 )
-            }
-        },
-        confirmButton = {
-            Button(onClick = { onConfirm(title, description) }) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Dismiss")
+            )
+            Spacer(modifier = Modifier.height(15.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    shape = RoundedCornerShape(5.dp),
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 4.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+
+                    )
+                ) {
+                    Text("Dismiss",style = MaterialTheme.typography.bodyLarge)
+                }
+
+                Button(
+                    shape = RoundedCornerShape(5.dp),
+                    onClick = { onConfirm(title, description) },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 4.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Dark100,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Text("Confirm",style = MaterialTheme.typography.bodyLarge)
+                }
             }
         }
-    )
+    }
 }
 
