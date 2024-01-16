@@ -3,6 +3,7 @@ package com.example.gruppe20todoapp.reps
 import com.example.gruppe20todoapp.database.Database
 import com.example.gruppe20todoapp.database.TodoEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class TodoRepoImpl(private val database: Database): TodoRepo {
     private val dao = database.todoDao()
@@ -13,7 +14,11 @@ class TodoRepoImpl(private val database: Database): TodoRepo {
     override suspend fun deleteTasks(todo: TodoEntity) = dao.deleteTask(todo)
 
     override suspend fun searchTasks(searchQuery: String): Flow<List<TodoEntity>> {
-        return dao.searchTasks("%$searchQuery%")
+        return if (searchQuery.isEmpty()) {
+            dao.getAllTasks()
+        } else {
+            dao.searchTasks("%$searchQuery%")
+        }
     }
     override fun getAllTasks(): Flow<List<TodoEntity>> {
         return dao.getAllTasks()

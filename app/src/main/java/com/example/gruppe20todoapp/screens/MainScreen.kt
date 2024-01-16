@@ -73,6 +73,7 @@ import com.example.gruppe20todoapp.ui.theme.Dark100
 fun MainScreen(
     viewModel: MainVM = viewModel()
 ) {
+    var searchQuery by remember { mutableStateOf("") }
     val tasks by viewModel.tasks.collectAsState()
     val (dialogOpen, setDialogOpen) = remember {
         mutableStateOf(false)
@@ -232,6 +233,12 @@ fun MainScreen(
                     .padding(paddings)
 
             ) {
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChanged = { searchQuery = it },
+                    onSearch = { viewModel.searchTasks(it) }
+                )
+
                 FilterButtons(viewModel = viewModel)
 
                 AnimatedVisibility(
@@ -284,6 +291,30 @@ fun MainScreen(
             }
         }
     }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBar(query: String, onQueryChanged: (String) -> Unit, onSearch: (String) -> Unit) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = {
+            onQueryChanged(it)
+            onSearch(it)
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        label = { Text("Search tasks",style = MaterialTheme.typography.bodyLarge) },
+        singleLine = true,
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            textColor = Color.White,
+            cursorColor = Color.White,
+            focusedBorderColor = Color.White,
+            unfocusedBorderColor = Color.White,
+            focusedLabelColor = Color.White,
+            unfocusedLabelColor = Color.White
+        )
+    )
 }
 
 @Composable
