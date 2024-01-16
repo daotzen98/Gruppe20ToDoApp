@@ -28,6 +28,8 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
@@ -40,6 +42,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -57,8 +60,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -294,18 +300,43 @@ fun MainScreen(
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(query: String, onQueryChanged: (String) -> Unit, onSearch: (String) -> Unit) {
+fun SearchBar(
+    query: String,
+    onQueryChanged: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    focusManager: FocusManager = LocalFocusManager.current
+) {
     OutlinedTextField(
         value = query,
-        onValueChange = {
-            onQueryChanged(it)
-            onSearch(it)
+        onValueChange = { updatedQuery ->
+            onQueryChanged(updatedQuery)
+            onSearch(updatedQuery)
         },
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        label = { Text("Search tasks",style = MaterialTheme.typography.bodyLarge) },
+        label = { Text("Search tasks", color = Color.White) },
         singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+        keyboardActions =
+        KeyboardActions(onDone = {
+            focusManager.clearFocus()
+        }),
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = {
+                    onQueryChanged("")
+                    onSearch("")
+                    focusManager.clearFocus()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Clear search query",
+                        tint = Color.White
+                    )
+                }
+            }
+        },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = Color.White,
             cursorColor = Color.White,
@@ -316,6 +347,8 @@ fun SearchBar(query: String, onQueryChanged: (String) -> Unit, onSearch: (String
         )
     )
 }
+
+
 
 @Composable
 fun FilterButtons(viewModel: MainVM) {
@@ -498,7 +531,6 @@ fun EditTaskDialog(
     var description by remember { mutableStateOf(task.description) }
 
     Dialog(onDismissRequest = onDismiss) {
-        // Dialog's content
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(10.dp))
