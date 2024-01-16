@@ -315,7 +315,7 @@ fun SearchBar(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        label = { Text("Search tasks", color = Color.White) },
+        label = { Text("Search tasks", style = MaterialTheme.typography.bodyLarge) },
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
         keyboardActions =
