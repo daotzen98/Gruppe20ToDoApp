@@ -1,5 +1,6 @@
 package com.example.gruppe20todoapp.reps
 
+import com.example.gruppe20todoapp.api.GiphyResponse
 import com.example.gruppe20todoapp.database.TodoEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -12,5 +13,7 @@ interface TodoRepo {
     fun getAllTasks(): Flow<List<TodoEntity>>
     fun getCompletedTasks(): Flow<List<TodoEntity>>
     fun getNotCompletedTasks(): Flow<List<TodoEntity>>
+
+
 
 }

@@ -3,7 +3,6 @@ package com.example.gruppe20todoapp.reps
 import com.example.gruppe20todoapp.database.Database
 import com.example.gruppe20todoapp.database.TodoEntity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 class TodoRepoImpl(private val database: Database): TodoRepo {
     private val dao = database.todoDao()
@@ -29,5 +28,7 @@ class TodoRepoImpl(private val database: Database): TodoRepo {
     override fun getNotCompletedTasks(): Flow<List<TodoEntity>> {
         return dao.getNotCompletedTasks()
     }
+
+
 }
 

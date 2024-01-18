@@ -1,7 +1,7 @@
 package com.example.gruppe20todoapp.screens
 
+import android.widget.ImageView
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
@@ -51,6 +52,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -67,14 +69,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import  androidx.lifecycle.viewmodel.compose.viewModel
+import com.bumptech.glide.Glide
 import com.example.gruppe20todoapp.database.TodoEntity
 import com.example.gruppe20todoapp.database.addDate
 import com.example.gruppe20todoapp.ui.theme.Dark100
+import kotlinx.coroutines.delay
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     viewModel: MainVM = viewModel()
@@ -87,6 +92,13 @@ fun MainScreen(
 
     var showEditDialog by remember { mutableStateOf(false) }
     var currentEditingItem by remember { mutableStateOf<TodoEntity?>(null) }
+
+
+    val gifUrl by viewModel.gifUrl.collectAsState()
+
+    if (gifUrl != null) {
+        DisplayGifDialog(gifUrl = gifUrl, onDismiss = { viewModel.clearGifUrl() })
+    }
 
     if (showEditDialog) {
         EditTaskDialog(
@@ -298,6 +310,67 @@ fun MainScreen(
         }
     }
 }
+
+@Composable
+fun DisplayGifWithGlide(gifUrl: String) {
+    AndroidView(factory = { context ->
+        ImageView(context).apply {
+            Glide.with(context)
+                .asGif()
+                .load(gifUrl)
+                .into(this)
+        }
+    }, modifier = Modifier.size(350.dp, 300.dp)) // Fixed size for the ImageView
+}
+@Composable
+fun DisplayGifDialog(gifUrl: String?, onDismiss: () -> Unit) {
+    if (gifUrl != null) {
+        Dialog(onDismissRequest = { onDismiss() }) {
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(12.dp))
+                    .padding(16.dp)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.width(300.dp)
+                ) {
+                    Text(
+                        text = "Great Job!",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    DisplayGifWithGlide(gifUrl = gifUrl)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        shape = RoundedCornerShape(5.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Text("Continue",
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                }
+            }
+            // Dismiss the dialog after a delay
+            LaunchedEffect(Unit) {
+                delay(10000) // 10000ms = 10 seconds
+                onDismiss()
+            }
+        }
+    }
+}
+
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
@@ -395,7 +468,7 @@ fun FilterButton(text: String, selected: Boolean, onClick: () -> Unit) {
 }
 
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
+@OptIn( ExperimentalFoundationApi::class)
 @Composable
 fun LazyItemScope.TodoItem(todo: TodoEntity, onClick: () -> Unit, onDelete: () -> Unit, onEdit: () -> Unit) {
     val color by animateColorAsState(
