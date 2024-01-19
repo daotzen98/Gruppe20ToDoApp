@@ -15,3 +15,5 @@ data class GifImages(
 data class GifOriginal(
     val url: String
 )
+
+

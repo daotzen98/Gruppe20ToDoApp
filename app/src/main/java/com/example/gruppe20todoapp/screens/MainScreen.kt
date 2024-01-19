@@ -12,6 +12,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -86,15 +87,13 @@ fun MainScreen(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     val tasks by viewModel.tasks.collectAsState()
+    var showEditDialog by remember { mutableStateOf(false) }
+    var currentEditingItem by remember { mutableStateOf<TodoEntity?>(null) }
+    //val groupedTasks by viewModel.groupedTasks.collectAsState()
+    val gifUrl by viewModel.gifUrl.collectAsState()
     val (dialogOpen, setDialogOpen) = remember {
         mutableStateOf(false)
     }
-
-    var showEditDialog by remember { mutableStateOf(false) }
-    var currentEditingItem by remember { mutableStateOf<TodoEntity?>(null) }
-
-
-    val gifUrl by viewModel.gifUrl.collectAsState()
 
     if (gifUrl != null) {
         DisplayGifDialog(gifUrl = gifUrl, onDismiss = { viewModel.clearGifUrl() })
@@ -231,7 +230,8 @@ fun MainScreen(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = "Add Task"
+                    contentDescription = "Add Task",
+                    modifier = Modifier.size(30.dp)
                 )
             }
         },
@@ -290,8 +290,12 @@ fun MainScreen(
                             ),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(tasks.sortedBy { it.done }, key = { it.id }) { todo ->
-                            TodoItem(todo = todo,
+                        tasks.forEach { (date, taskList) ->
+                            item {
+                                TaskDateHeader(date)
+                            }
+                            items(taskList, key = { it.id }) { todo ->
+                                TodoItem(todo = todo,
                                 onClick = {
                                     viewModel.updateTodo(todo.copy(done = !todo.done))
                                 },
@@ -301,8 +305,9 @@ fun MainScreen(
                                 },
                                 onDelete = {
                                     viewModel.deleteTodo(todo)
-                                }
-                            )
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -311,6 +316,23 @@ fun MainScreen(
     }
 }
 
+@Composable
+fun TaskDateHeader(date: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding()
+            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
+            .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
+    ) {
+        Text(
+            text = date,
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+    }
+}
 @Composable
 fun DisplayGifWithGlide(gifUrl: String) {
     AndroidView(factory = { context ->
@@ -420,8 +442,6 @@ fun SearchBar(
         )
     )
 }
-
-
 
 @Composable
 fun FilterButtons(viewModel: MainVM) {
