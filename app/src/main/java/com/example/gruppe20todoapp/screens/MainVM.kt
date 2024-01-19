@@ -96,6 +96,7 @@ class MainVM:ViewModel(),KoinComponent {
     fun deleteTodo(todo: TodoEntity){
         viewModelScope.launch(Dispatchers.IO){
             repo.deleteTasks(todo)
+            getTodos()
         }
     }
     fun addTodo(todo: TodoEntity){
