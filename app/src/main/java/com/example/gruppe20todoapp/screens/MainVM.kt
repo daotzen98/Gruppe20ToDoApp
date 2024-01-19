@@ -32,7 +32,7 @@ class MainVM:ViewModel(),KoinComponent {
     val tasks = _tasks.asStateFlow()
     private val _gifUrl = MutableStateFlow<String?>(null)
     val gifUrl: StateFlow<String?> = _gifUrl.asStateFlow()
-    val groupedTasks: StateFlow<Map<String, List<TodoEntity>>> = _groupedTasks.asStateFlow()
+    //val groupedTasks: StateFlow<Map<String, List<TodoEntity>>> = _groupedTasks.asStateFlow()
 
     init {
         getTodos()
